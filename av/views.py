@@ -20,6 +20,7 @@ def parse_brand(request):
 
     brand_items = Brand.objects.all()
     brands_length = len(brand_items)
+    added_brands_number = 0
 
     for item in response.json():
         for brand in brand_items:
@@ -29,15 +30,18 @@ def parse_brand(request):
             brand_item = Brand()
             if brands_length == 0:
                 brand_item.id = item["id"]   # could be used for the first parse without id check
-            # else:
-            #     for brand2 in brand_items:
-            #         if item["id"] == brand2.id:
-            #             break
-            #     else:
-            #         brand_item.id = item["id"]
+            else:
+                for brand2 in Brand.objects.all():
+                    if item["id"] == brand2.id:
+                        break
+                else:
+                    brand_item.id = item["id"]
             brand_item.name = item["name"]
             brand_item.slug = item["slug"]
             brand_item.save()
-            msg = "Добавлены новые марки авто!!!"
+            added_brands_number += 1
+
+    if added_brands_number != 0:
+        msg = f"Добавлены новые марки авто количеством: {added_brands_number}!!!"
 
     return HttpResponse(msg)
